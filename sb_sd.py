@@ -34,6 +34,8 @@ from config import prefix
 from config import group_email
 from config import drive_data
 from config import sa_file
+from config import encryption_key
+from config import salt
 
 if (prefix == 'aZaSjsklaj'):
     print ("\n\nIt doesn't look like you've edited the default config.")
@@ -124,10 +126,13 @@ def create_bin_file_on_root(folder_id, fn, name):
 
 
 def create_rclone_remote(drive_id, name):
-    rc_cmd = f"rclone config create {name} drive scope=drive service_account_file={sa_file} team_drive={drive_id}"
+    rc_cmd = f"rclone config create {name} crypt remote {name}:Media/ password={encryption_key} password2={salt}"
     print(rc_cmd)
     drive_res = os.system(rc_cmd)
     print(drive_res)
+
+def create_local_folders(name)
+    mkdir "\mnt\local\Media\"+name
 
 remote_list=""
 
@@ -151,16 +156,21 @@ for dn, mediapath in drive_data.items():
             perm_id = add_user(td_id, key, role)
             print(f"** user {key} created as {role}, ID: {perm_id}")
 
-        folder_name = f"-- {drivename} Shared --"
-        folder_id = create_folder(td_id, folder_name)
-        print(f"** Folder {folder_name} created, ID {folder_id}")
-        mountfile = drivename.lower().replace(' ', '_') + "_mounted.bin"
-        file_id = create_bin_file_on_root(td_id, SOURCE_FILE, mountfile)
-        print(f"** bin file created on root, ID {file_id}")
+        #Enable creation of Shared Folder
+        #folder_name = f"-- {drivename} Shared --"
+        #folder_id = create_folder(td_id, folder_name)
+        #print(f"** Folder {folder_name} created, ID {folder_id}")
+        
+        #Enable creation of file to avoid not_mounted errors.
+        #mountfile = drivename.lower().replace(' ', '_') + "_mounted.bin"
+        #file_id = create_bin_file_on_root(td_id, SOURCE_FILE, mountfile)
+        #print(f"** bin file created on root, ID {file_id}")
 
         create_media_dirs(td_id, mediapath)
 
-        create_rclone_remote(td_id, drivename)
+        create_rclone_remote(td_id, drivename, encryption_key, salt)
+
+        create_local_folders(dn)
 
         remote_list += f"{drivename}:/ "
     else:
