@@ -131,7 +131,7 @@ def create_rclone_remote(drive_id, name):
     drive_res = os.system(rc_cmd)
     print(drive_res)
 
-def create_local_folders(name)
+def create_local_folders(name):
     mkdir "\mnt\local\Media\"+name
 
 remote_list=""
