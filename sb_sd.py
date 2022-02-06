@@ -125,15 +125,33 @@ def create_bin_file_on_root(folder_id, fn, name):
             supportsTeamDrives=True, fields='id').execute().get('id')
 
 
-def create_rclone_remote(name, encryption_key, salt):
+def create_rclone_remote(drive_id, name, encryption_key, salt):
+    #creates base team drive
     rc_cmd = f"rclone config create {name} drive scope=drive service_account_file={sa_file} team_drive={drive_id}"
     print(rc_cmd)
     drive_res = os.system(rc_cmd)
     print(drive_res)
-    rc_cmd = f"rclone config create encrypt_{name} crypt remote {name}:Media/ password={encryption_key} password2={salt}"
-    print(rc_cmd)
-    drive_res = os.system(rc_cmd)
+    #creates encrypted mount and creates encrypted directories
+    rc_cmd_e = f"rclone config create encrypt_{name} crypt remote {name}: password={encryption_key} password2={salt}"
+    rc_cmd_e_dir = f"rclone mkdir encrypt_{name}:Media"
+    name_split = name.split("-", 1)[1]
+    rc_cmd_e_dir2 = f"rclone mkdir encrypt_{name}:Media/{name_split}"
+    
+    print(rc_cmd_e)
+    drive_res = os.system(rc_cmd_e)
     print(drive_res)
+    print(rc_cmd_e_dir)
+    drive_res2 = os.system(rc_cmd_e_dir)
+    print(drive_res2)
+    print(rc_cmd_e_dir2)
+    drive_res3 = os.system(rc_cmd_e_dir2)
+    print(drive_res3)
+
+    #creates local directories
+    cld_cmd = f"mkdir /mnt/local/Media/{name_split}"
+    print(cld_cmd)
+    local_dir_res = os.system(cld_cmd)
+    print(local_dir_res)
 
 remote_list=""
 
@@ -167,11 +185,12 @@ for dn, mediapath in drive_data.items():
         #file_id = create_bin_file_on_root(td_id, SOURCE_FILE, mountfile)
         #print(f"** bin file created on root, ID {file_id}")
 
-        create_media_dirs(td_id, mediapath)
+        #enable creation of unencrypted dirs
+        #create_media_dirs(td_id, mediapath)
 
-        create_rclone_remote(drivename, encryption_key, salt)
+        create_rclone_remote(td_id, drivename, encryption_key, salt)
 
-        remote_list += f"{drivename}:/ "
+        remote_list += f"encrypt_{drivename}:/ "
     else:
         for drive in response.get('drives', []):
             print(f"Found shared drive: {drive.get('name')} ({drive.get('id')})")
@@ -181,4 +200,3 @@ if len(remote_list) > 0:
     rc_cmd = f"rclone config create google union upstreams \"{remote_list}\""
     print(rc_cmd)
     os.system(rc_cmd)
-
