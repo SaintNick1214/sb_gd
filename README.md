@@ -1,6 +1,8 @@
 # sb_gd
 Script to set up Google Drive stuff for saltbox/cloudbox
 
+This version creates encrypted drive mounts and adds them to unionfs.  Although it worked extremely well for me, this should be considered a beta product!!!
+
 ## Assumptions:
  1. You have verified Google account permissions as described here: https://docs.saltbox.dev/reference/google-account-perms/
  1. You have created a Google project as described here: https://docs.saltbox.dev/reference/google-project-setup/
