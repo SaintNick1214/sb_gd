@@ -125,7 +125,7 @@ def create_bin_file_on_root(folder_id, fn, name):
             supportsTeamDrives=True, fields='id').execute().get('id')
 
 
-def create_rclone_remote(drive_id, name):
+def create_rclone_remote(name, encryption_key, salt):
     rc_cmd = f"rclone config create {name} crypt remote {name}:Media/ password={encryption_key} password2={salt}"
     print(rc_cmd)
     drive_res = os.system(rc_cmd)
@@ -165,7 +165,7 @@ for dn, mediapath in drive_data.items():
 
         create_media_dirs(td_id, mediapath)
 
-        create_rclone_remote(td_id, drivename, encryption_key, salt)
+        create_rclone_remote(drivename, encryption_key, salt)
 
         remote_list += f"{drivename}:/ "
     else:
