@@ -126,7 +126,11 @@ def create_bin_file_on_root(folder_id, fn, name):
 
 
 def create_rclone_remote(name, encryption_key, salt):
-    rc_cmd = f"rclone config create {name} crypt remote {name}:Media/ password={encryption_key} password2={salt}"
+    rc_cmd = f"rclone config create {name} drive scope=drive service_account_file={sa_file} team_drive={drive_id}"
+    print(rc_cmd)
+    drive_res = os.system(rc_cmd)
+    print(drive_res)
+    rc_cmd = f"rclone config create encrypt_{name} crypt remote {name}:Media/ password={encryption_key} password2={salt}"
     print(rc_cmd)
     drive_res = os.system(rc_cmd)
     print(drive_res)
